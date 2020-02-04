@@ -404,6 +404,19 @@ void setSensorBuf(uint16_t Address, uint8_t State)
   Buf_Sperre = false;
 }
 
+void setDelaySensor(uint8_t DelayTime, uint16_t Address, uint8_t State)
+{
+  if (Buf_Load == N_SENDBUFFER)
+  {
+    setSensor(Address, State);
+  }
+  else
+  {
+    SendBuffer[Buf_WriteIndex].Rest_Time = DelayTime;
+    setSensorBuf(Address, State);
+  }
+}
+
 void SendBufferInit()
 {
   uint8_t i;

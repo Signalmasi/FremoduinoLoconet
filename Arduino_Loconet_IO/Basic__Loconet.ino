@@ -91,7 +91,7 @@ struct {
 
 void getWeiche(uint16_t Address, uint8_t State);
 void getWeicheLage(uint16_t Address, uint8_t State);
-void getSignal(uint16_t Address, uint8_t State);
+void getSignal(uint16_t Address, uint8_t SPD_AX, uint8_t SPD_XA, uint8_t SE_STAT);
 void getSensor(uint16_t Address, uint8_t State);
 void getGPON();
 void getGPOFF();
@@ -115,9 +115,9 @@ void ReceiveLoconet()
         decAddress++;
       }
       
-      State = LnPacket->se.se2;
+      //State = LnPacket->se.se2;
       //Serial.print("Receive Signal, Address "); Serial.print(decAddress); Serial.print(", State "); Serial.println(State);     
-      getSignal(decAddress, State);
+      getSignal(decAddress, LnPacket->se.se2, LnPacket->se.se3, LnPacket->se.se1);
     }
     //handle OPC_SW_REQ messages for turnout states
     if (LnPacket->srq.command == OPC_SW_REQ)

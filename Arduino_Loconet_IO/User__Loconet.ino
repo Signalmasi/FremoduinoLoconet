@@ -1,13 +1,6 @@
 void getWeiche(uint16_t Address, uint8_t State) //Reaktion auf Weichenbefehl auf dem Loconet
 {
-  uint8_t i;
-  if (Address == 699)
-  {
-    for (i=0; i<N_INPUT; i++)
-    {
-      InputReaction(i, E[i].state);  
-    }  
-  }
+
 }
 
 void getWeicheLage(uint16_t Address, uint8_t State) //Reaktion auf Weichenrückmeldung auf dem Loconet
@@ -17,7 +10,7 @@ void getWeicheLage(uint16_t Address, uint8_t State) //Reaktion auf Weichenrückm
   //State = 0x10: Lage_Gerade  
 }
 
-void getSignal(uint16_t Address, uint8_t State) //Reaktion auf Signalbefehl auf dem Loconet
+void getSignal(uint16_t Address, uint8_t SPD_AX, uint8_t SPD_XA, uint8_t SE_STAT) //Reaktion auf Signalbefehl auf dem Loconet
 {
 
 }

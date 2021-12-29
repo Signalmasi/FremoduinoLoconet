@@ -97,6 +97,13 @@ void getGPON();
 void getGPOFF();
 void SendBufferSetWriteIndex();
 
+LN_STATUS setWeiche(uint16_t Address, uint8_t Direction, uint8_t Output = 1);
+LN_STATUS setWeicheLage(uint16_t Address, uint8_t State);
+LN_STATUS setSignal(uint16_t Address, uint8_t SPD_AX, uint8_t SPD_XA = 0, uint8_t SE_STAT = 0);
+LN_STATUS setSensor(uint16_t Address, uint8_t State);
+LN_STATUS setGPON();
+LN_STATUS setGPOFF();
+
 void ReceiveLoconet()
 {
   uint16_t decAddress;

@@ -7,17 +7,17 @@ const uint8_t LN_SendPin = 7;
 const boolean Uhlenbrock_Offset = true; //bei true ist die erste Adresse mit 1 bezeichnet, sonst mit 0. Entspricht der Nomenklatur kommerzieller Produkte
 const boolean Elekdra_Feedback = false; //bei true ist die Adressierung kompatibel zu Elekdra bzw. Watti-Platinen, sonst wie bei Uhlenbrock, Deloof, John Jabour etc.
 
-#define Thrown            0x00
-#define Closed            0x01
-#define Abzweig           0x00
-#define Gerade            0x01
-#define Afbuigend         0x00
-#define Recht             0x01
-#define Lage_Gerade       0x10
-#define Lage_Abzweigend   0x01
-#define Lage_Undefiniert  0x00
-#define Frei              0x00
-#define Besetzt           0x01
+#define Thrown            0b00
+#define Closed            0b01
+#define Abzweig           0b00
+#define Gerade            0b01
+#define Afbuigend         0b00
+#define Recht             0b01
+#define Lage_Gerade       0b10
+#define Lage_Abzweigend   0b01
+#define Lage_Undefiniert  0b00
+#define Frei              0b00
+#define Besetzt           0b01
 
 /*#define SPD_STOP          0x00
 #define SPD_GO_10         0x08

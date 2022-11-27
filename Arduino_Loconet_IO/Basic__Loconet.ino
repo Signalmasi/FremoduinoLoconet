@@ -9,12 +9,14 @@ const boolean Elekdra_Feedback = false; //bei true ist die Adressierung kompatib
 
 #define Thrown            0b00
 #define Closed            0b01
+#define rot               0b00
+#define gruen             0b01
 #define Abzweig           0b00
 #define Gerade            0b01
 #define Afbuigend         0b00
 #define Recht             0b01
 #define Lage_Gerade       0b10
-#define Lage_Abzweigend   0b01
+#define Lage_Abzweig      0b01
 #define Lage_Undefiniert  0b00
 #define Frei              0b00
 #define Besetzt           0b01
@@ -96,13 +98,7 @@ void getSensor(uint16_t Address, uint8_t State);
 void getGPON();
 void getGPOFF();
 void SendBufferSetWriteIndex();
-
-LN_STATUS setWeiche(uint16_t Address, uint8_t Direction, uint8_t Output = 1);
-LN_STATUS setWeicheLage(uint16_t Address, uint8_t State);
-LN_STATUS setSignal(uint16_t Address, uint8_t SPD_AX, uint8_t SPD_XA = 0, uint8_t SE_STAT = 0);
-LN_STATUS setSensor(uint16_t Address, uint8_t State);
-LN_STATUS setGPON();
-LN_STATUS setGPOFF();
+boolean isFahrt(uint8_t State);
 
 void ReceiveLoconet()
 {
@@ -122,7 +118,7 @@ void ReceiveLoconet()
         decAddress++;
       }
       
-      //State = LnPacket->se.se2;
+      State = LnPacket->se.se2;
       //Serial.print("Receive Signal, Address "); Serial.print(decAddress); Serial.print(", State "); Serial.println(State);     
       getSignal(decAddress, LnPacket->se.se2, LnPacket->se.se3, LnPacket->se.se1);
     }
@@ -154,7 +150,7 @@ void ReceiveLoconet()
       State = ((LnPacket->srq.sw2 & 0x30) >> 4) ;
       if ((LnPacket->srq.sw2 & 0xC0) == 0x00) //nur Befehle mit 00CT-Struktur beachten
       {
-        //Serial.print("Receive Weiche, Address "); Serial.print(decAddress); Serial.print(", State "); Serial.println(State); 
+        //Serial.print("Receive WeicheLage, Address "); Serial.print(decAddress); Serial.print(", State "); Serial.println(State); 
         getWeicheLage(decAddress, State);
       }
     }
@@ -336,8 +332,14 @@ void setDelayWeiche(uint8_t DelayTime, uint16_t Address, uint8_t State)
   }
   else
   {
+    Buf_Sperre = true;  //Ausführung sperren
+    SendBuffer[Buf_WriteIndex].Command = OPC_SW_REQ;
+    SendBuffer[Buf_WriteIndex].Address = Address;
+    SendBuffer[Buf_WriteIndex].State   = State;
+    Buf_Load++;
     SendBuffer[Buf_WriteIndex].Rest_Time = DelayTime;
-    setWeicheBuf(Address, State);
+    SendBufferSetWriteIndex();
+    Buf_Sperre = false;
   }
 }
 
@@ -387,8 +389,14 @@ void setDelaySignal(uint8_t DelayTime, uint16_t Address, uint8_t State)
   }
   else
   {
+    Buf_Sperre = true;  //Ausführung sperren
+    SendBuffer[Buf_WriteIndex].Command = OPC_SE;
+    SendBuffer[Buf_WriteIndex].Address = Address;
+    SendBuffer[Buf_WriteIndex].State   = State;
+    Buf_Load++;
     SendBuffer[Buf_WriteIndex].Rest_Time = DelayTime;
-    setSignalBuf(Address, State);
+    SendBufferSetWriteIndex();
+    Buf_Sperre = false;
   }
 }
 
@@ -419,8 +427,14 @@ void setDelaySensor(uint8_t DelayTime, uint16_t Address, uint8_t State)
   }
   else
   {
+    Buf_Sperre = true;  //Ausführung sperren
+    SendBuffer[Buf_WriteIndex].Command = OPC_INPUT_REP;
+    SendBuffer[Buf_WriteIndex].Address = Address;
+    SendBuffer[Buf_WriteIndex].State   = State;
+    Buf_Load++;
     SendBuffer[Buf_WriteIndex].Rest_Time = DelayTime;
-    setSensorBuf(Address, State);
+    SendBufferSetWriteIndex();
+    Buf_Sperre = false;
   }
 }
 
@@ -488,6 +502,23 @@ void SendBufferExec()
         }       
     }  
   }
+}
+
+boolean isFahrt(uint8_t State)  //Abfrage nach Fahrtbegriff
+{
+  return    ((State == SPD_GO_10)
+          || (State == SPD_GO_20)
+          || (State == SPD_GO_30)
+          || (State == SPD_GO_40)
+          || (State == SPD_GO_50)
+          || (State == SPD_GO_60)
+          || (State == SPD_GO_70)
+          || (State == SPD_GO_80)
+          || (State == SPD_GO_90)
+          || (State == SPD_GO_100)
+          || (State == SPD_GO_110)
+          || (State == SPD_GO_120)
+          || (State == SPD_GO));
 }
 
 void Setup_Loconet()
